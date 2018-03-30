@@ -28,21 +28,23 @@ public class TurtleClient {
         Path relativePath = Paths.get("test-inputsV2/ascii");
         Path absolutePath = relativePath.toAbsolutePath().normalize();
 
-        System.out.println("Welcome to the Simple HTTP Client. \n"
-                + "You are currently in" + absolutePath + "\n"
-                + "Type the name of the file you would like to POST");
+        System.out.println("Welcome to the Simple HTTP Client");
 
         // read the file contents into a byte array
-        //try {
-        String fileName = args[0];
-        Path path = Paths.get(absolutePath.toString(), fileName);
-        System.out.println("You will post: " + path);
-
-        byte[] data = Files.readAllBytes(path);
-        //}
-        //catch(Exception ex){
-        //    System.out.println("Exception occurred");
-        //}
+        String fileName;
+        Path path;
+        byte[] data = null;
+        
+        try {
+        fileName = args[0];
+        path = Paths.get(absolutePath.toString(), fileName);
+        System.out.println("You posted: " + path);
+        data = Files.readAllBytes(path);
+        }
+        
+        catch(Exception ex){
+            System.out.println("Error while reading a .atl file");
+        }
 
         // open a network connection
         try (Socket socket = new Socket(InetAddress.getByName(SERVER_HOST), SERVER_PORT)) {
@@ -65,10 +67,6 @@ public class TurtleClient {
             os.flush();
 
             // send message body (the bytes that we read from the file previously)
-            // Use the raw OutputStream here, NOT the Writer.
-            // Why? Because we need to send exactly the number of bytes
-            // that we advertised in the Content-Length header, without
-            // any character encoding messing things up
             os.write(data);
 
             // flush output to server
@@ -85,27 +83,26 @@ public class TurtleClient {
             Matcher m;
             String headerLine;
             int contentLength = 0;
-            while ((headerLine = readHeaderLine(is)) != null && !headerLine.isEmpty()) {
-                  System.out.println(headerLine);
-                  m = pattern.matcher(headerLine);
+            while ((headerLine = readHeaderLine(is)) != null && !headerLine.isEmpty()) {                
+                m = pattern.matcher(headerLine);
 
-                  if (m.find()) {
-                      contentLength = Integer.parseInt(m.group(2));                      
-                  }
-              }
-              System.out.println(contentLength);
+                if (m.find()) {
+                    contentLength = Integer.parseInt(m.group(2));
+                }
+            }
+            
 
             // read the response message body into a byte array
-
-            byte[] turtleGraphics = new byte[contentLength];            
-           
-
+            byte[] turtleGraphics = new byte[contentLength];
+            is.read(turtleGraphics);
             // decode the message bytes and output as text
             // For this exercise you should assume that the
             // message body is unicode text encoded with UTF-8.
-            String s = new String(turtleGraphics );
+            String s = new String(turtleGraphics);
             System.out.print(s);
             
+            writer.close();
+            socket.close();
         } catch (Exception ex) {
             System.out.println("Something has crashed");
         }
