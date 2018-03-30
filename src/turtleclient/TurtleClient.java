@@ -84,31 +84,28 @@ public class TurtleClient {
             Pattern pattern = Pattern.compile("(Content-Length: )([0-9]{3,5})");
             Matcher m;
             String headerLine;
+            int contentLength = 0;
             while ((headerLine = readHeaderLine(is)) != null && !headerLine.isEmpty()) {
-                System.out.println(headerLine);
-                m = pattern.matcher(headerLine);
-                if (m.find()) {
-                    int contentLength = Integer.parseInt(m.group(2));
-                    System.out.println(contentLength);
-                }
-            }
-            System.out.println();
+                  System.out.println(headerLine);
+                  m = pattern.matcher(headerLine);
+
+                  if (m.find()) {
+                      contentLength = Integer.parseInt(m.group(2));                      
+                  }
+              }
+              System.out.println(contentLength);
 
             // read the response message body into a byte array
-            //
-            // TODO
-            byte[] turtleGraphics = new byte[897];
-            // copied solution from SimpleClient
-            int b;
-            while ((b = is.read()) != -1) {
-                System.out.print((char) b);
-                System.out.flush();
-            }
+
+            byte[] turtleGraphics = new byte[contentLength];            
+           
+
             // decode the message bytes and output as text
             // For this exercise you should assume that the
             // message body is unicode text encoded with UTF-8.
-            //
-            // TODO
+            String s = new String(turtleGraphics );
+            System.out.print(s);
+            
         } catch (Exception ex) {
             System.out.println("Something has crashed");
         }
