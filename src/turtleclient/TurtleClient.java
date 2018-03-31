@@ -25,7 +25,7 @@ public class TurtleClient {
 
     public static void main(String[] args) throws IOException {
 
-        Path relativePath = Paths.get("test-inputsV2/ascii");
+        Path relativePath = Paths.get("test-inputsV2/utf-8");
         Path absolutePath = relativePath.toAbsolutePath().normalize();
 
         System.out.println("Welcome to the Simple HTTP Client");
@@ -38,7 +38,7 @@ public class TurtleClient {
         try {
         fileName = args[0];
         path = Paths.get(absolutePath.toString(), fileName);
-        System.out.println("You posted: " + path);
+        System.out.println("File to be decoded: " + path);
         data = Files.readAllBytes(path);
         }
         
